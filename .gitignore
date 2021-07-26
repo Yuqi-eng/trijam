@@ -1,0 +1,7 @@
+/target
+/perf
+*.data
+*.old
+/data
+*.wasm
+/html
