@@ -34,11 +34,14 @@ impl Cat {
         if self.animation_time > 0.5 {
           self.animation_time = 0.;
           self.animation_state += 1;
+          if self.animation_state > 4 {
+            self.animation_state = 0;
+          }
         }
     }
 
     fn draw(&self) {
-        let x = (self.animation_state as f32) * 39.;
+        let x = (self.animation_state as f32) * 41.;
 
         draw_texture_ex(self.sprite, self.x, self.y, WHITE,
           DrawTextureParams {
@@ -53,7 +56,14 @@ impl Cat {
 #[macroquad::main(window_conf)]
 async fn main(){
     let background = load_texture("assets/GAME_ROOM_2.png").await.unwrap();
-    let mut cat = Cat::new(100., 400., load_texture("assets/cat.png").await.unwrap());
+    let cat_sprite = load_texture("assets/cat.png").await.unwrap();
+
+    let mut cats: Vec<Cat> = vec![
+      Cat::new(100., 400., cat_sprite),
+      Cat::new(140., 380., cat_sprite),
+      Cat::new(190., 390., cat_sprite),
+      Cat::new(200., 350., cat_sprite)
+    ];
 
     loop {
         clear_background(WHITE);
@@ -64,16 +74,13 @@ async fn main(){
         draw_line(69.,  230., 508., 230., 1., RED);
         draw_line(640., 334., 508., 230., 1., RED);
 
+        // tick
         let delta = get_frame_time();
-        cat.tick(delta);
+        cats.iter_mut().for_each(|cat| cat.tick(delta));
 
-        cat.draw();
-/*
-        draw_texture_ex(cat, 100., 400., WHITE, DrawTextureParams {
-          source: Some(Rect{x: 0., y: 0., w: 38., h: 30.}),
-          ..Default::default()
-        });
-*/
+        // draw
+        cats.iter_mut().for_each(|cat| cat.draw());
+
         next_frame().await
     }
 }
